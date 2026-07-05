@@ -25,6 +25,24 @@ const isTauriFileHandle = (
 ): handle is TauriFileHandle =>
   !!handle && typeof handle === 'object' && '__tauriPath' in (handle as any);
 
+const TAURI_LAST_PATH_KEY = 'drawnix-tauri-last-path';
+
+const rememberTauriPath = (path: string) => {
+  try {
+    localStorage.setItem(TAURI_LAST_PATH_KEY, path);
+  } catch {
+    // localStorage indisponível, ignora silenciosamente
+  }
+};
+
+export const getLastTauriPath = (): string | null => {
+  try {
+    return localStorage.getItem(TAURI_LAST_PATH_KEY);
+  } catch {
+    return null;
+  }
+};
+
 export const fileOpen = <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
@@ -86,6 +104,7 @@ const tauriFileOpen = async (
   const files = await Promise.all(
     paths.map(async (path) => {
       const bytes = await readFile(path);
+      rememberTauriPath(path);
       const name = path.split(/[\\/]/).pop() ?? 'file';
       const file = new File([bytes], name);
       // json.ts lê especificamente `file.handle`, não `file.__tauriPath`
@@ -152,6 +171,8 @@ const tauriFileSave = async (
   const resolvedBlob = await blob;
   const arrayBuffer = await resolvedBlob.arrayBuffer();
   await writeFile(path, new Uint8Array(arrayBuffer));
+
+  rememberTauriPath(path);
 
   return { __tauriPath: path };
 };

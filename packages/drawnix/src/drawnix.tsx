@@ -47,6 +47,8 @@ import { Tutorial } from './components/tutorial';
 import { LASER_POINTER_CLASS_NAME } from './utils/laser-pointer';
 import { Toast, useToast } from './components/toast/toast';
 
+import { getLastTauriPath } from './data/filesystem';
+
 export type DrawnixProps = {
   value: PlaitElement[];
   viewport?: Viewport;
@@ -111,11 +113,12 @@ export const Drawnix: React.FC<DrawnixProps> = ({
 
   const [appState, setAppState] = useState<DrawnixState>(() => {
     const md = new MobileDetect(window.navigator.userAgent);
+    const lastPath = getLastTauriPath();
     return {
       toolState: mergeToolState(initialToolState),
       isMobile: md.mobile() !== null,
       isPencilMode: false,
-      fileHandle: null,
+      fileHandle: lastPath ? { __tauriPath: lastPath } : null,
       openDialogType: null,
       openCleanConfirm: false,
       copyTransparent: initialPreference?.copyTransparent ?? false,
