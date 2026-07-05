@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "drawnix-desktop",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "identifier": "com.drawnix.desktop",
   "build": {
     "frontendDist": "../dist/apps/web",
