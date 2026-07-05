@@ -13,6 +13,20 @@ import { BoardCreationMode, setCreationMode } from '@plait/common';
 import { MindPointerType } from '@plait/mind';
 import { FreehandShape } from './freehand/type';
 import { ArrowLineShape, BasicShapes } from '@plait/draw';
+import { getCurrentWindow } from '@tauri-apps/api/window';
+
+const isTauri = (): boolean =>
+  typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
+const toggleTauriFullscreen = () => {
+  if (!isTauri()) {
+    return;
+  }
+  const win = getCurrentWindow();
+  win.isFullscreen().then((isFullscreen) => {
+    win.setFullscreen(!isFullscreen);
+  });
+};
 
 export const buildDrawnixHotkeyPlugin = (
   updateAppState: (appState: Partial<DrawnixState>) => void
@@ -67,6 +81,11 @@ export const buildDrawnixHotkeyPlugin = (
         }
         if (isHotkey(['mod+u'])(event)) {
           addImage(board);
+          event.preventDefault();
+          return;
+        }
+        if (isHotkey(['f11'], { byKey: true })(event)) {
+          toggleTauriFullscreen();
           event.preventDefault();
           return;
         }
